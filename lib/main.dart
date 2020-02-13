@@ -1,4 +1,5 @@
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:flare_flutter/flare_controls.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -8,11 +9,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Controlling a simple animation'),
     );
   }
 }
@@ -27,6 +27,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // you only need a simple controller
+  // rive has a good concrete implementation
+  FlareControls _controls;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _controls = FlareControls();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -42,18 +53,36 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Container(
-            height: 200,
-            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-            child: FlareActor(
-              "assets/corazon.flr",
-              shouldClip: false,
-              alignment: Alignment.bottomCenter,
-              fit: BoxFit.contain,
-              animation: "favorite",
-//              controller: _teddyController,
-            )),
+        child: Column(
+          children: <Widget>[
+            Spacer(),
+            Expanded(
+                child: FlareActor(
+                  "assets/corazon.flr",
+                  animation: "favorite",
+                  controller: _controls,
+                ),
+            ),
+            Spacer(),
+            FlatButton(
+              onPressed: replayAnimation,
+              child: Text("Replay"),
+            ),
+            Spacer(),
+          ],
+        ),
       ),
     );
+  }
+
+  void replayAnimation() {
+    // if the animation is still running do nothing, otherwise play the animation
+    // notice bools need to be checked like this
+    // its one of those dart things....krant
+    if (_controls.isActive.value == false) {
+      debugPrint('Playing');
+      _controls.play("favorite");
+    }
+
   }
 }
